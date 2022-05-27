@@ -11,7 +11,7 @@ image:
   # The Keycloak image repository
   repository: quay.io/keycloak/keycloak
   # Overrides the Keycloak image tag whose default is the chart appVersion
-  tag: "17.0.1"
+  tag: "18.0.0"
   # The Keycloak image pull policy
   pullPolicy: IfNotPresent
 
@@ -375,6 +375,19 @@ database:
 cache:
   # Use "custom" to disable automatic cache configuration
   stack: default
+  # When stack is "custom" a custom file needs to be provided or discovery should be set to DNS_PING or KUBE_PING
+  custom:
+    file:
+    # Encrypts and decrypts communication in JGroups by using a secret key shared by all cluster members.
+    # In addition, AUTH has been included as part of the configuration, so that only authenticated nodes may request the secret key from the coordinator.
+    secure:
+      enabled: false
+      # Path to keystore, which needs to be provided
+      keystorePath: /data/keystores/jgroups.jceks
+      keystorePassword: someSecret
+      authSecret: someSecret
+    # jgroups discovery can be set to DNS_PING or KUBE_PING
+    discovery: DNS_PING
 
 proxy:
   enabled: true

@@ -227,7 +227,37 @@
         "type": "object",
         "properties": {
           "stack": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(default|custom)$"
+          },
+          "custom": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "secure": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "keystorePath": {
+                    "type": "string"
+                  },
+                  "keystorePassword": {
+                    "type": "string"
+                  },
+                  "authSecret": {
+                    "type": "string"
+                  }
+                }
+              },
+              "discovery": {
+                "type": "string",
+                "pattern": "^(DNS_PING|KUBE_PING)$"
+              }
+            }
           }
         }
       },

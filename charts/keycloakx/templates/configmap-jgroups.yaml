@@ -1,0 +1,11 @@
+{{- if and (eq .Values.cache.stack "custom") (not .Values.cache.custom.file) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "keycloak.fullname" . }}-cache-config
+  labels:
+    {{- include "keycloak.labels" . | nindent 4 }}
+data:
+  cache-custom-templated.xml: |-
+    {{- tpl (.Files.Get "files/cache-custom-templated.xml") . | nindent 4 }}
+{{- end -}}
