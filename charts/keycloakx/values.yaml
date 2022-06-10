@@ -382,7 +382,7 @@ cache:
     # In addition, AUTH has been included as part of the configuration, so that only authenticated nodes may request the secret key from the coordinator.
     secure:
       enabled: false
-      # Path to keystore, which needs to be provided
+      # Local path to keystore, which needs to be provided
       keystorePath: /data/keystores/jgroups.jceks
       keystorePassword: someSecret
       authSecret: someSecret

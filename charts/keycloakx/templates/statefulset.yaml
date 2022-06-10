@@ -170,6 +170,10 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+            {{- if and (eq .Values.cache.stack "custom") (.Values.cache.custom.secure.enabled) }}
+            - name: jgroups-keystore
+              mountPath: "/mnt/keystores/jgroups.jceks"
+            {{- end }}
             {{- if and (eq .Values.cache.stack "custom") (not .Values.cache.custom.file) }}
             - name: cache-config
               mountPath: "/opt/keycloak/conf/cache-custom-templated.xml"
@@ -216,10 +220,15 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       volumes:
+        {{- if and (eq .Values.cache.stack "custom") (.Values.cache.custom.secure.enabled) }}
+        - name: jgroups-keystore
+          secret:
+            secretName: {{ include "keycloak.fullname" $ }}-jgroups-keystore
+        {{- end }}
         {{- if and (eq .Values.cache.stack "custom") (not .Values.cache.custom.file) }}
         - name: cache-config
           configMap:
-            name: {{ include "keycloak.fullname" $ }}-cache-config
+            name: { { include "keycloak.fullname" $ } }-cache-config
         {{- end }}
         {{- with .Values.startupScripts }}
         - name: startup
