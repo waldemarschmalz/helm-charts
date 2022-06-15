@@ -347,9 +347,9 @@ Please refer to the section on database configuration for how to configure a sec
 For high availability, Keycloak must be run with multiple replicas (`replicas > 1`).
 The chart has a helper template (`keycloak.serviceDnsName`) that creates the DNS name based on the headless service.
 
-### Cache Stack
+## Cache Stack
 
-#### Default Cache Stack
+### Default Cache Stack
 
 JGroups discovery via DNS_PING is enabled by default but needs an additional JVM setting, which can be configured as follows:
 
@@ -365,11 +365,11 @@ extraEnv: |
       -Djgroups.dns_query={{ include "keycloak.serviceDnsName" . }}
 ```
 
-#### Custom Cache Stack
+### Custom Cache Stack
 
 The helm chart provides configuration to use `KUBE_PING` and `DNS_PING` discovery with secure communication (encrypted and authenticated jgroups communication) enabled or disabled.
 
-##### DNS_PING
+### DNS_PING
 
 `DNS_PING` is also used with `cache.stack` = `default`.
 But with `cache.stack` = `custom` and `cache.stack.custom.discovery` = `DNS_PING` it is possible to enable secure jgroups communication (see paragraph [Secured Cache Stack](#secured-cache-stack)).
@@ -385,7 +385,7 @@ cache:
     discovery: DNS_PING
 ```
 
-##### KUBE_PING
+### KUBE_PING
 
 ```yaml
 cache:
@@ -410,20 +410,6 @@ ENV JGROUPS_KUBERNETES_VERSION 1.0.16.Final
 RUN curl -s -L -o /opt/keycloak/providers/jgroups-kubernetes-$JGROUPS_KUBERNETES_VERSION.jar https://search.maven.org/remotecontent?filepath=org/jgroups/kubernetes/jgroups-kubernetes/$JGROUPS_KUBERNETES_VERSION/jgroups-kubernetes-$JGROUPS_KUBERNETES_VERSION.jar
 ```
 
-Configure `kubeping_namespace` and `kubeping_label` system properties via `JAVA_OPTS_APPEND`
-```yaml
-extraEnv: |
-  - name: JAVA_OPTS_APPEND
-    value: >-
-      -Dkubeping_namespace={{ .Release.Namespace }}
-      -Dkubeping_label="keycloak-cluster=default"
-```
-Add `podLabels`
-```yaml
-podLabels:
-  keycloak-cluster: default
-```
-
 Configure `serviceAccount.create=true` and `serviceAccount.allowReadPods=true` to allow kube_ping to enlist keycloak pods
 ```yaml
 serviceAccount:
@@ -445,7 +431,7 @@ Configure `rbac.rules`
           - list
   ```
 
-##### Secured Cache Stack
+### Secured Cache Stack
 
 This is a basic configuration for JGroups Authentication and Encryption.
 When `cache.custom.secure` is enabled, all `secure` properties need to be set.
@@ -464,17 +450,14 @@ cache:
     discovery: DNS_PING
 ```
 
-// TODO: env var for keystorePath -> create secret from keystore
-
 Note that you need to provide a keystore and include it into your container, add the path with its filename as `jgroups.encryption.keystorePath`.
-
-SYM_ENCRYPT uses store type JCEKS. To generate a keystore compatible with JCEKS, use the following command line options to keytool:
+To generate a keystore compatible with JCEKS, use the following command line options to keytool:
 ```
 $ keytool -genseckey -alias myKey -keypass changeit -storepass changeit -keyalg Blowfish -keysize 56 -keystore defaultStore.keystore -storetype JCEKS
 ```
 
 
-#### Custom Cache Stack
+### Custom Cache Stack via custom file
 
 If a custom JGroups discovery is needed, then you can configure:
 

@@ -33,6 +33,9 @@ spec:
         {{- printf "%s: %s" $key (tpl $value $ | quote) | nindent 8 }}
         {{- end }}
       labels:
+        {{- if (eq .Values.cache.custom.discovery "KUBE_PING") }}
+        keycloak-cluster: default
+        {{- end }}
         {{- include "keycloak.selectorLabels" . | nindent 8 }}
         {{- range $key, $value := .Values.podLabels }}
         {{- printf "%s: %s" $key (tpl $value $ | quote) | nindent 8 }}
@@ -172,7 +175,9 @@ spec:
           volumeMounts:
             {{- if and (eq .Values.cache.stack "custom") (.Values.cache.custom.secure.enabled) }}
             - name: jgroups-keystore
-              mountPath: "/mnt/keystores/jgroups.jceks"
+              mountPath: "/opt/keycloak/conf/jgroups.jceks"
+              subPath: jgroups.jceks
+              readOnly: true
             {{- end }}
             {{- if and (eq .Values.cache.stack "custom") (not .Values.cache.custom.file) }}
             - name: cache-config
@@ -228,7 +233,7 @@ spec:
         {{- if and (eq .Values.cache.stack "custom") (not .Values.cache.custom.file) }}
         - name: cache-config
           configMap:
-            name: { { include "keycloak.fullname" $ } }-cache-config
+            name: {{ include "keycloak.fullname" $ }}-cache-config
         {{- end }}
         {{- with .Values.startupScripts }}
         - name: startup
